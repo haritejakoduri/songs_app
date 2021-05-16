@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const config=require('config')
 const MusicInfoGeter=require('./musicData');
+const {storeSongData}=require('../db/songs')
 const MusicPath='/mnt/sda8/songs'
 const fileName=config.get('file_name')
 async function scanFiles(){
@@ -19,9 +20,10 @@ async function scanFiles(){
            let metadata= await MusicInfoGeter(songs[i])
            if(metadata){
            let needed_metadata={
+                path:songs[i],
                 song_name:metadata.common.title,
                 album_name:metadata.common.album,
-                image:{data: metadata.common.picture[0].data, contentType: metadata.common.picture[0].format},
+                image:{data: metadata.common.picture[0].data, imagetype: metadata.common.picture[0].format},
                 artists:metadata.common.artists,
                 composer:metadata.common.composer,
                 track:{
@@ -32,10 +34,11 @@ async function scanFiles(){
                     duration:metadata.format.duration,
                 }
            }
-              console.log(needed_metadata)
+              let result=await storeSongData(needed_metadata)
            }
 
         }
     });
+    return true
 }
 module.exports=scanFiles;
