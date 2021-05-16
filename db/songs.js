@@ -34,6 +34,13 @@ const song =new Song({
 const result =await song.save();   
 return result;
 }
+async function getSongs(data){
+   let song =await Song.find({song_name:{ $regex: '.*' + data.song_name + '.*' }})
+   .limit(10)
+   .sort({song_name:1}).select({image:0});
+   return song;
+}
 module.exports={
-    storeSongData:storeSongData
+    storeSongData:storeSongData,
+    getSongs:getSongs
 }
